@@ -4,6 +4,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+
 ### STS ###
 .apt_generated
 .classpath
@@ -31,3 +32,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### .env ###
+.env
+
+### .env ###
+/src/main/java/com/brittany/spring_resource_server/certs/
