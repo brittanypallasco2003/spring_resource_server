@@ -36,5 +36,5 @@ build/
 ### .env ###
 .env
 
-### .env ###
-/src/main/java/com/brittany/spring_resource_server/certs/
+### certs ###
+/src/main/resources/certs
