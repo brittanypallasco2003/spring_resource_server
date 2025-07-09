@@ -1,7 +1,9 @@
 package com.brittany.spring_resource_server.service;
 
-import org.springframework.security.core.Authentication;
+import com.brittany.spring_resource_server.controller.DTOs.TokenRequest;
 
 public interface TokenService {
-    public String generateToken(Authentication authentication);
+    public String generateToken(TokenRequest request);
+
+     
 }
