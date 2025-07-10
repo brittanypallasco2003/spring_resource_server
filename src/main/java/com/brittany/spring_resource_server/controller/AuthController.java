@@ -1,11 +1,11 @@
 package com.brittany.spring_resource_server.controller;
 
-import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.brittany.spring_resource_server.controller.DTOs.TokenRequest;
+import com.brittany.spring_resource_server.controller.DTOs.TokenResponse;
 import com.brittany.spring_resource_server.service.TokenService;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,9 +25,9 @@ public class AuthController {
 
     @PostMapping("/token")
     public ResponseEntity<?> generateToken(@RequestBody TokenRequest request) {
-        String accessToken=tokenService.generateToken(request);
+        TokenResponse response=tokenService.generateToken(request);
 
-        return ResponseEntity.ok().body(Map.of("accessToken",accessToken));
+        return ResponseEntity.ok().body(response);
     }
 
 }
