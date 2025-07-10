@@ -1,9 +1,10 @@
 package com.brittany.spring_resource_server.service;
 
 import com.brittany.spring_resource_server.controller.DTOs.TokenRequest;
+import com.brittany.spring_resource_server.controller.DTOs.TokenResponse;
 
 public interface TokenService {
-    public String generateToken(TokenRequest request);
+    public TokenResponse generateToken(TokenRequest request);
 
      
 }
