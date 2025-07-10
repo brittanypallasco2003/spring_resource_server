@@ -41,13 +41,13 @@ public class UserModel {
     private List<RefreshTokenModel> refreshTokens;
 
     @ManyToMany
-    @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name="user_id"), inverseJoinColumns = @JoinColumn(name="role_id"),
-    uniqueConstraints = @UniqueConstraint(columnNames = {"user_id","role_id"}))
+    @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"), uniqueConstraints = @UniqueConstraint(columnNames = {
+            "user_id", "role_id" }))
     private Set<RoleModel> roles;
 
     public UserModel() {
-        this.roles=new HashSet<>();
-        this.refreshTokens=new ArrayList<>();
+        this.roles = new HashSet<>();
+        this.refreshTokens = new ArrayList<>();
     }
 
     @Builder
@@ -55,6 +55,12 @@ public class UserModel {
         this.username = username;
         this.password = password;
         this.roles = roles;
-        this.refreshTokens=refreshTokens;
-    }    
+        this.refreshTokens = refreshTokens;
+    }
+
+    public UserModel addTokenRefresh(RefreshTokenModel refreshTokenModel) {
+        refreshTokens.add(refreshTokenModel);
+        refreshTokenModel.setUser(this);
+        return this;
+    }
 }
