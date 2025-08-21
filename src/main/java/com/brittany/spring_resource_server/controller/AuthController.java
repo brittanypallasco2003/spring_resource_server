@@ -8,6 +8,8 @@ import com.brittany.spring_resource_server.controller.DTOs.TokenRequest;
 import com.brittany.spring_resource_server.controller.DTOs.TokenResponse;
 import com.brittany.spring_resource_server.service.TokenService;
 
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +26,7 @@ public class AuthController {
     }
 
     @PostMapping("/token")
-    public ResponseEntity<?> generateToken(@RequestBody TokenRequest request) {
+    public ResponseEntity<?> generateToken(@Valid @RequestBody TokenRequest request) {
         TokenResponse response=tokenService.generateToken(request);
 
         return ResponseEntity.ok().body(response);
