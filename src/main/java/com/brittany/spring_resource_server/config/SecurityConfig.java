@@ -2,6 +2,10 @@ package com.brittany.spring_resource_server.config;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -17,12 +21,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -65,13 +73,39 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/").permitAll().anyRequest().authenticated())
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                        .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> ex
-                    .authenticationEntryPoint(customAuthenticationEntryPoint()))
+                        .authenticationEntryPoint(customAuthenticationEntryPoint()))
                 .build();
 
+    }
+
+        // Convierte el claim "authorities" a roles reconocidos por Spring
+    @Bean
+    JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            Object raw = jwt.getClaims().get("authorities");
+            Stream<String> rolesStream = Stream.empty();
+            if (raw instanceof List) {
+                @SuppressWarnings("unchecked")
+                List<Object> list = (List<Object>) raw;
+                rolesStream = list.stream().map(Object::toString);
+            } else if (raw instanceof String) {
+                rolesStream = Stream.of(((String) raw).trim().split("\\s+"));
+            }
+
+            return rolesStream
+                .filter(s -> !s.isBlank())
+                .map(s -> s.startsWith("ROLE_") ? s : "ROLE_" + s)
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+        });
+        return converter;
     }
 
     @Bean
